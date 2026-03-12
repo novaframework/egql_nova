@@ -28,7 +28,8 @@ execute(Query, Params, Ctx) ->
             catch
                 throw:{'$graphql_throw', Err} ->
                     #{errors => graphql:format_errors(Ctx, Err)};
-                error:Reason:_Stack ->
+                error:Reason:Stack ->
+                    logger:error("egql error: ~p~n~p", [Reason, Stack]),
                     #{errors => [#{message => format_reason(Reason)}]}
             end;
         {error, Err} ->
