@@ -11,13 +11,14 @@
 
 pre_request(Req, #{context_fun := Fun} = _Options) when is_function(Fun, 1) ->
     Ctx = Fun(Req),
-    Req2 = case Req of
-        #{extra_state := ES} when is_map(ES) ->
-            ExistingCtx = maps:get(context, ES, #{}),
-            Req#{extra_state => ES#{context => maps:merge(ExistingCtx, Ctx)}};
-        _ ->
-            Req#{extra_state => #{context => Ctx}}
-    end,
+    Req2 =
+        case Req of
+            #{extra_state := ES} when is_map(ES) ->
+                ExistingCtx = maps:get(context, ES, #{}),
+                Req#{extra_state => ES#{context => maps:merge(ExistingCtx, Ctx)}};
+            _ ->
+                Req#{extra_state => #{context => Ctx}}
+        end,
     {ok, Req2};
 pre_request(Req, _Options) ->
     {ok, Req}.

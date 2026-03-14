@@ -9,11 +9,12 @@ execute(Query, Params) ->
 -spec execute(binary(), map(), map()) -> map().
 execute(Query, Params, Ctx) ->
     OpName = maps:get(<<"operationName">>, Params, undefined),
-    Vars = case maps:get(<<"variables">>, Params, #{}) of
-        null -> #{};
-        V when is_map(V) -> V;
-        _ -> #{}
-    end,
+    Vars =
+        case maps:get(<<"variables">>, Params, #{}) of
+            null -> #{};
+            V when is_map(V) -> V;
+            _ -> #{}
+        end,
     case graphql:parse(Query) of
         {ok, AST} ->
             try
