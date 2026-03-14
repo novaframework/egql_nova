@@ -11,4 +11,3 @@ jobs:
     uses: Taure/erlang-ci/.github/workflows/ci.yml@v1
     with:
       enable-eunit: false
-      enable-audit: true
