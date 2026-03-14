@@ -11,7 +11,7 @@ graphql(#{json := Body} = Req) ->
     Result = egql_nova:execute(Query, Body, Ctx),
     {json, 200, #{}, Result};
 graphql(#{body := RawBody} = Req) ->
-    Body = jsone:decode(RawBody),
+    Body = json:decode(RawBody),
     Query = maps:get(<<"query">>, Body, <<>>),
     Ctx = build_context(Req),
     Result = egql_nova:execute(Query, Body, Ctx),
@@ -22,32 +22,35 @@ graphiql(_Req) ->
     {ok, 200, #{<<"content-type">> => <<"text/html">>}, graphiql_html()}.
 
 build_context(Req) ->
-    ExtraCtx = case Req of
-        #{extra_state := #{context := C}} when is_map(C) -> C;
-        _ -> #{}
-    end,
+    ExtraCtx =
+        case Req of
+            #{extra_state := #{context := C}} when is_map(C) -> C;
+            _ -> #{}
+        end,
     ExtraCtx.
 
 graphiql_html() ->
-    <<"<!DOCTYPE html>
-<html>
-<head>
-  <title>GraphiQL</title>
-  <style>
-    body { height: 100vh; margin: 0; overflow: hidden; }
-    #graphiql { height: 100vh; }
-  </style>
-  <script crossorigin src=\"https://unpkg.com/react@18/umd/react.production.min.js\"></script>
-  <script crossorigin src=\"https://unpkg.com/react-dom@18/umd/react-dom.production.min.js\"></script>
-  <link rel=\"stylesheet\" href=\"https://unpkg.com/graphiql/graphiql.min.css\" />
-  <script crossorigin src=\"https://unpkg.com/graphiql/graphiql.min.js\"></script>
-</head>
-<body>
-  <div id=\"graphiql\">Loading...</div>
-  <script>
-    const fetcher = GraphiQL.createFetcher({ url: window.location.pathname });
-    ReactDOM.createRoot(document.getElementById('graphiql'))
-      .render(React.createElement(GraphiQL, { fetcher }));
-  </script>
-</body>
-</html>">>.
+    <<
+        "<!DOCTYPE html>\n"
+        "<html>\n"
+        "<head>\n"
+        "  <title>GraphiQL</title>\n"
+        "  <style>\n"
+        "    body { height: 100vh; margin: 0; overflow: hidden; }\n"
+        "    #graphiql { height: 100vh; }\n"
+        "  </style>\n"
+        "  <script crossorigin src=\"https://unpkg.com/react@18/umd/react.production.min.js\"></script>\n"
+        "  <script crossorigin src=\"https://unpkg.com/react-dom@18/umd/react-dom.production.min.js\"></script>\n"
+        "  <link rel=\"stylesheet\" href=\"https://unpkg.com/graphiql/graphiql.min.css\" />\n"
+        "  <script crossorigin src=\"https://unpkg.com/graphiql/graphiql.min.js\"></script>\n"
+        "</head>\n"
+        "<body>\n"
+        "  <div id=\"graphiql\">Loading...</div>\n"
+        "  <script>\n"
+        "    const fetcher = GraphiQL.createFetcher({ url: window.location.pathname });\n"
+        "    ReactDOM.createRoot(document.getElementById('graphiql'))\n"
+        "      .render(React.createElement(GraphiQL, { fetcher }));\n"
+        "  </script>\n"
+        "</body>\n"
+        "</html>"
+    >>.
